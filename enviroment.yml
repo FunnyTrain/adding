@@ -1,0 +1,15 @@
+name: tarsier7b-env
+channels:
+  - conda-forge
+  - pytorch
+  - defaults
+dependencies:
+  - python=3.9
+  - pip
+  - cudatoolkit=11.3  # Asegúrate de usar la versión compatible con tu entorno
+  - pytorch=1.10.0  # Cambia la versión de pytorch si es necesario
+  - transformers=4.12.0
+  - torchmetrics
+  - tqdm
+  - pandas
+  - scikit-learn
