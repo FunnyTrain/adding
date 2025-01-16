@@ -4,24 +4,22 @@ import torch
 from tqdm import tqdm
 from transformers import AutoModelForImageText, AutoTokenizer, AutoProcessor
 
-# Cargar el modelo y tokenizador con el tipo adecuado
 model_name = "omni-research/Tarsier-7b"
 model = AutoModelForImageText.from_pretrained(model_name)
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-# Procesador para manejar imágenes y video (dependiendo de los fotogramas o imágenes que se usen)
+# Procesador para manejar imágenes y video 
 processor = AutoProcessor.from_pretrained(model_name)
 
-# Función de inferencia con imágenes (o secuencia de fotogramas)
+# Función de inferencia con imágenes 
 def inference_with_images(image_folder, question):
     images = []
-    # Cargar varias imágenes (o fotogramas de video)
+    # Cargar varias imágenes 
     for img_file in sorted(os.listdir(image_folder)):
         if img_file.endswith(('.jpg', '.png', '.jpeg')):
             img_path = os.path.join(image_folder, img_file)
             images.append(img_path)
     
-    # Formato de la entrada para el modelo
     messages = [
         {
             "role": "user",
@@ -43,7 +41,7 @@ def inference_with_images(image_folder, question):
     )
     inputs = inputs.to("cuda")
 
-    # Realizar la inferencia: Generación de la respuesta
+    # Inferencia
     generated_ids = model.generate(**inputs, max_new_tokens=128)
     output_text = tokenizer.decode(generated_ids[0], skip_special_tokens=True)
 
@@ -51,12 +49,10 @@ def inference_with_images(image_folder, question):
 
 # Función para procesar el dataframe y hacer inferencias para cada pregunta
 def process_and_infer(parquet_file, output_csv):
-    df = pd.read_parquet(parquet_file)  # Leer archivo parquet
+    df = pd.read_parquet(parquet_file)  
 
-    # Crear un diccionario para almacenar los resultados
+    # diccionario para almacenar los resultados
     results = []
-
-    # Obtener los IDs de las preguntas
     question_ids = df['question_id'].unique()
 
     # Barra de progreso para procesar las preguntas
@@ -80,7 +76,6 @@ def process_and_infer(parquet_file, output_csv):
     results_df = pd.DataFrame(results)
     results_df.to_csv(output_csv, index=False)
 
-# Ejemplo de uso
-parquet_file = 'val.parquet'  # Archivo parquet con las preguntas
-output_csv = 'predictions.csv'  # Archivo de salida
+parquet_file = 'val.parquet' 
+output_csv = 'predictions.csv' 
 process_and_infer(parquet_file, output_csv)
